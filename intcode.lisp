@@ -32,14 +32,14 @@
 
 (defgeneric run-program (processor)
   (:method (processor)
-    (loop (execute processor 
-		   (aref (buffer (memory processor)) 
+    (loop (execute processor
+		   (aref (buffer (memory processor))
 			 (pc processor))))))
 
 ;;; INSTRUCTIONS
 
 (defclass processor-class (c2mop:standard-class)
-  ((%primitives 
+  ((%primitives
     :accessor processor-primitives
     :initform (make-array 10 :adjustable t :fill-pointer 0))))
 
@@ -76,4 +76,3 @@
 
 (define-primitive .halt (processor)
   (throw :halt processor))
-
