@@ -53,6 +53,8 @@
 
 (defgeneric primitives (thing)
   (:method-combination nconc)
+  (:method nconc ((s symbol))
+	   (primitives (find-class s)))
   (:method nconc (_)
 	   (list))
   (:method nconc ((c processor-class))
