@@ -52,10 +52,16 @@
   (:metaclass processor-class))
 
 (defgeneric primitives (thing)
-  (:method ((c processor-class))
-    (copy-seq (processor-primitives c)))
-  (:method ((p processor))
-    (primitives (class-of p))))
+  (:method-combination nconc)
+  (:method nconc (_)
+	   (list))
+  (:method nconc ((c processor-class))
+	   (delete-duplicates
+	    (nconc (coerce (processor-primitives c) 'list)
+		   (mapcan #'primitives
+			   (c2mop:class-direct-superclasses c)))))
+  (:method nconc ((p processor))
+	   (primitives (class-of p))))
 
 ;;;; BASE IMPLEMENTATION
 
