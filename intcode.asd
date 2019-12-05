@@ -1,7 +1,7 @@
 (defsystem :intcode
   :depends-on (:alexandria :cl-ppcre :closer-mop)
   :components ((:file "package")
-	       (:file "macros")
 	       (:file "intcode")
+	       (:file "macros")	       
 	       (:file "primitives")
 	       (:file "v1")))

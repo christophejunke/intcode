@@ -5,16 +5,14 @@
 (defclass v1 (processor) ()
   (:metaclass processor-class))
 
-(define-op (v1 99 :next nil) (p)
+(define-op (v1 99 :halt :flow :stop) (p)
   `(.halt ,p))
 
-(define-op (v1 1) (p x y res)
-  `(.store ,p ,res (+ (.load ,p ,x)
-		      (.load ,p ,y))))
+(define-op (v1 01 :add :store res) (p x y res)
+  `(+ ,x ,y))
 
-(define-op (v1 2) (p x y res)
-  `(.store ,p ,res (* (.load ,p ,x)
-		      (.load ,p ,y))))
+(define-op (v1 02 :mul :store res) (p x y res)
+  `(* ,x ,y))
 
 ;;; REPLAYING DAY 02
 
