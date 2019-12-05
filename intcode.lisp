@@ -12,7 +12,7 @@
 (defclass memory ()
   ((%buffer :initarg :buffer :reader buffer)))
 
-(deftype opcode () '(unsigned-byte 32))
+(deftype opcode () 'fixnum)
 
 (defgeneric make-memory (in)
   (:method ((buffer vector))
@@ -29,6 +29,9 @@
 ;;; PROCESSOR
 
 (defgeneric execute (processor opcode))
+
+(defgeneric unpack (processor opcode modes &rest args)
+  (:method (p o m &rest a) (values-list a)))
 
 (defgeneric run-program (processor)
   (:method (processor)
@@ -65,16 +68,3 @@
   (:method nconc ((p processor))
 	   (primitives (class-of p))))
 
-;;;; BASE IMPLEMENTATION
-
-(define-primitive .load (processor address)
-  (aref (buffer (memory processor)) address))
-
-(define-primitive .store (processor address value)
-  (setf (aref (buffer (memory processor)) address) value))
-
-(defmethod run-program :around ((p processor))
-  (catch :halt (call-next-method)))
-
-(define-primitive .halt (processor)
-  (throw :halt processor))

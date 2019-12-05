@@ -9,7 +9,7 @@
   `(.halt ,p))
 
 (define-op (v1 1) (p x y res)
-  `(.store ,p ,res (+ (.load ,p ,x) 
+  `(.store ,p ,res (+ (.load ,p ,x)
 		      (.load ,p ,y))))
 
 (define-op (v1 2) (p x y res)
@@ -18,10 +18,9 @@
 
 ;;; REPLAYING DAY 02
 
-(defun day-02-part-1 (in)
+(defun test-day-02-part-1 (&optional (in #P"02.in"))
   (let ((p (make-instance 'v1 :memory (make-memory in))))
     (.store p 1 12)
     (.store p 2 2)
     (run-program p)
-    (.load p 0)))
-
+    (assert (= 3058646 (.load p 0)))))
