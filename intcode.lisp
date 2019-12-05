@@ -90,40 +90,42 @@
   (:method ((inst instruction))
     (argnames (args inst))))
 
-(defun make-instruction (processor-prototype
-			 opcode nickname flow arguments store expr)
-  (check-type store symbol)
-  (destructuring-bind (processor . arguments) arguments
-    (loop
-       with flow = (ecase flow
-		     ((:stop 0 nil) :stop)
-		     ((:next 1 t) :next)
-		     ((:jump) flow))
-       with mask = 0
-       for index from 0
-       for a in arguments
-       for a$ = (parse-argument processor-prototype a)
-       collect a$ into args$
-       do (setf (logbitp index mask)
-		(or (eq (argname a$) store)
-		    (eq (argkind a$) :addr)))
-       finally (return
-		 (make-instance
-		  'instruction
-		  :opcode opcode
-		  :store store
-		  :args (coerce args$ 'vector)
-		  :control-flow flow
-		  :expander (eval
-			     `(lambda (,processor ,@(argnames args$))
-				(declare (ignorable ,processor))
-				,(if store
-				     ``((setf (at (memory ,,processor)
-						  ,,store)
-					      ,,expr))
-				     ``(,,expr))))
-		  :mode-mask mask
-		  :nick nickname)))))
+(defgeneric make-instruction 
+    (processor-prototype opcode nickname flow arguments store expr)
+  (:method     
+      (processor-prototype opcode nickname flow arguments store expr)
+    (check-type store symbol)
+    (destructuring-bind (processor . arguments) arguments
+      (loop
+	 with flow = (ecase flow
+		       ((:stop 0 nil) :stop)
+		       ((:next 1 t) :next)
+		       ((:jump) flow))
+	 with mask = 0
+	 for index from 0
+	 for a in arguments
+	 for a$ = (parse-argument processor-prototype a)
+	 collect a$ into args$
+	 do (setf (logbitp index mask)
+		  (or (eq (argname a$) store)
+		      (eq (argkind a$) :addr)))
+	 finally (return
+		   (make-instance
+		    'instruction
+		    :opcode opcode
+		    :store store
+		    :args (coerce args$ 'vector)
+		    :control-flow flow
+		    :expander (eval
+			       `(lambda (,processor ,@(argnames args$))
+				  (declare (ignorable ,processor))
+				  ,(if store
+				       ``((setf (at (memory ,,processor)
+						    ,,store)
+						,,expr))
+				       ``(,,expr))))
+		    :mode-mask mask
+		    :nick nickname))))))
 
 (defgeneric decode (processor value)
   (:method ((p processor) opcode) opcode))
