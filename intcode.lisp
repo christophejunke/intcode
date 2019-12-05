@@ -77,11 +77,12 @@
 
 (defstruct (arg (:conc-name arg)) name kind)
 
-(defun parse-argument (arg)
-  (destructuring-bind (arg &optional kind) (ensure-list arg)
-    (make-arg :name arg
-	      :kind (ecase kind
-		      ((:addr nil) kind)))))
+(defgeneric parse-argument (processor arg)
+  (:method (processor arg)
+    (destructuring-bind (arg &optional kind) (ensure-list arg)
+      (make-arg :name arg
+		:kind (ecase kind
+			((:addr nil) kind))))))
 
 (defgeneric argnames (args)
   (:method ((args sequence))
@@ -89,7 +90,8 @@
   (:method ((inst instruction))
     (argnames (args inst))))
 
-(defun make-instruction (opcode nickname flow arguments store expr)
+(defun make-instruction (processor-prototype
+			 opcode nickname flow arguments store expr)
   (check-type store symbol)
   (destructuring-bind (processor . arguments) arguments
     (loop
@@ -100,7 +102,7 @@
        with mask = 0
        for index from 0
        for a in arguments
-       for a$ = (parse-argument a)
+       for a$ = (parse-argument processor-prototype a)
        collect a$ into args$
        do (setf (logbitp index mask)
 		(or (eq (argname a$) store)

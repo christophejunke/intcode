@@ -33,13 +33,15 @@
 		     code)
   (with-gensyms ($options _)
     (let* ((class (find-class class))
-	   (instruction (make-instruction opcode
+	   (prototype (make-instance class))
+	   (instruction (make-instruction prototype
+					  opcode
 					  nick
 					  flow
 					  (cons processor args)
 					  store
 					  code))
-	   (body (expand-execute (make-instance class)
+	   (body (expand-execute prototype
 				 processor
 				 $options
 				 instruction)))
