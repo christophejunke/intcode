@@ -1,0 +1,30 @@
+(in-package :advent.2019.intcode)
+
+(defclass memory ()
+  ((%buffer :initarg :buffer :reader buffer)))
+
+(deftype opcode () 'fixnum)
+
+(defgeneric make-memory (in)
+  (:method ((buffer vector))
+    (make-instance 'memory :buffer buffer))
+  (:method ((line string))
+    (make-memory (map '(vector opcode) #'parse-integer (split #\, line))))
+  (:method ((path pathname))
+    (with-open-file (in (memory-pathname path))
+      (make-memory (read-line in))))
+  (:method ((original memory))
+    (make-instance (class-of original)
+		   :buffer (copy-seq (buffer original)))))
+
+(defgeneric at (place address)
+  (:method ((buffer vector) (index integer))
+    (aref buffer index))
+  (:method ((memory memory) address)
+    (at (buffer memory) address)))
+
+(defgeneric (setf at) (value place address)
+  (:method (value (buffer vector) (index integer))
+    (setf (aref buffer index) value))
+  (:method (value (memory memory) address)
+    (setf (at (buffer memory) address) value)))

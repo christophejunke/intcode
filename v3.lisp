@@ -2,8 +2,9 @@
 
 ;; day 5 - part 2
 
-(defclass v3 (v2) ()
-  (:metaclass processor-class))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass v3 (v2) ()
+    (:metaclass processor-class)))
 
 (define-primitive ..when ((p v3) test expr)
   (declare (ignore p))
@@ -25,4 +26,5 @@
 (define-op (v3 8 :eq :store res) (p v1 v2 res)
   `(..ite ,p (= ,v1 ,v2) 1 0))
 
-(run v3 #P"05.in")
+(defun test-v3 ()
+  (run v3 #P"05.in"))

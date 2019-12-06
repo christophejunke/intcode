@@ -2,8 +2,9 @@
 
 ;; day 5 - part 1
 
-(defclass v2 (v1) ()
-  (:metaclass processor-class))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass v2 (v1) ()
+    (:metaclass processor-class)))
 
 (defun modebits (modes)
   (do ((bits 0) (i 0 (1+ i)))
@@ -42,4 +43,5 @@
 (equalp (buffer (memory (run v2 "1002,4,3,4,33")))
 	#(1002 4 3 4 99))
 
-(run v2 #P"05.in")
+(defun test-v2 ()
+  (run v2 #P"05.in"))
