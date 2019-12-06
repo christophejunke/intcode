@@ -7,6 +7,7 @@
 	       (:file "intcode")
 	       (:file "macros")	       
 	       (:file "primitives")
+	       (:file "base")
 	       (:file "v1")
 	       (:file "v2")
 	       (:file "v3")))
