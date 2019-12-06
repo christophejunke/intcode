@@ -56,3 +56,14 @@
 			   (c2mop:class-direct-superclasses c)))))
   (:method nconc ((p processor))
 	   (instructions (class-of p))))
+
+(defun fetch (processor)
+  "Return current instruction pointed by processor, and decoded options"
+  (multiple-value-bind (opcode options)
+      (decode processor
+	      (at (memory processor)
+		  (pc processor)))
+    (values (or (find opcode (instructions processor) :key #'opcode)
+		(error "Instruction not found: ~a (processor: ~s)"
+		       opcode processor))
+	    options)))
