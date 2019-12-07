@@ -46,7 +46,7 @@
 				     (or ,$next
 					 (+ ,$pc ,default-jump)))))))))))))))
 
-(defmethod make-instruction     
+(defmethod make-instruction
     (processor-prototype opcode nickname flow arguments store expr)
   (check-type store symbol)
   (destructuring-bind (processor . arguments) arguments

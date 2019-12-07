@@ -3,9 +3,7 @@
 (defvar *amplifier-controller* (make-memory #P"07.in"))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (ql:quickload '(:queues :queues.simple-queue))
-  (use-package :queues)
-  (defclass v3/d7 (v3) 
+  (defclass v3/d7 (v3)
     ((name :accessor name :initarg :name)
      (in :accessor in :initarg :in)
      (out :accessor out :initarg :out))
@@ -46,51 +44,43 @@
 		   #'print
 		   "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"))
 
-(let ((max 0))
-  (flet ((maximizer (value)
-	   (when (> value max)
-	     (setf max value))))
-    (map-permutations (lambda (phases)
-			(handler-case
-			    (let ((chain (make-amplifiers phases #'maximizer)))
-			      (map () #'run-program chain))
-			  (error (e)
-			    (warn "phase ~a: error ~s" phases e))))
-		      #(0 1 2 3 4)))
-  max)
-
-=> 65464
+(assert
+ (equalp
+  (let ((max 0))
+    (flet ((maximizer (value)
+	     (when (> value max)
+	       (setf max value))))
+      (map-permutations (lambda (phases)
+			  (handler-case
+			      (let ((chain (make-amplifiers phases #'maximizer)))
+				(map () #'run-program chain))
+			    (error (e)
+			      (warn "phase ~a: error ~s" phases e))))
+			#(0 1 2 3 4)))
+    max)
+  65464))
 
 ;; day 7 - part 2
 
 (define-primitive .read ((p v3/d7))
   (or (qpop (in p))
-      (throw :halt p)))
+      (.halt p)))
 
-(let ((max 0))
-  (flet ((maximizer (value)
-	   (when (> value max)
-	     (setf max value))))
-    (map-permutations 
-     (lambda (phases)
-       (handler-case
-	   (let (chain)
-	     (flet ((end-of-chain (value)
-		      (maximizer value)
-		      (qpush (in (first chain)) value)))
-	       (setf chain (make-amplifiers phases 
-					    #'end-of-chain))
-	       (loop
-		  for prev = (mapcar #'pc chain) then pcs
-		  for pcs = (map 'list 
-				 (lambda (p) 
-				   (run-program p)
-				   (pc p))
-				 chain)
-		  until (equalp pcs prev))))
-	 (error (e)
-	   (warn "phase ~a: error ~s" phases e))))
-     #(5 6 7 8 9)))
-  max)
-
-
+(assert
+ (= 1518124
+    (let ((max 0))
+      (flet ((run (p) (run-program p) (pc p))
+	     (maximize (value)
+	       (prog1 value
+		 (when (> value max)
+		   (setf max value)))))
+	(map-permutations
+	 (lambda (phases &aux chain)
+	   (flet ((end-of-chain (v) (qpush (in (first chain)) (maximize v))))
+	     (setf chain (make-amplifiers phases #'end-of-chain))
+	     (loop
+		for pre = (mapcar #'pc chain) then pcs
+		for pcs = (mapcar #'run chain)
+		until (equalp pcs pre))))
+	 #(5 6 7 8 9)))
+      max)))

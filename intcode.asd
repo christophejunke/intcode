@@ -1,5 +1,5 @@
 (defsystem :intcode
-  :depends-on (:alexandria :cl-ppcre :closer-mop)
+  :depends-on (:alexandria :cl-ppcre :closer-mop :queues.simple-queue)
   :components ((:file "package")
 	       (:file "memory")
 	       (:file "instructions")

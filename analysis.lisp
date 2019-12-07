@@ -11,4 +11,3 @@
 	     (argnames (args instruction))))))
 
 ;; => ((.STORE #:P ADDR (.READ #:P)))
-

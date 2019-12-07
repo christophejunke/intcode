@@ -6,8 +6,7 @@
   (defclass v3 (v2) ()
     (:metaclass processor-class)))
 
-(define-primitive ..if ((p v3) test then else)
-  (declare (ignore p))
+(define-special ..if (p test then else)
   `(if ,test ,then ,else))
 
 (define-op (v3 5 :jit :flow :jump) (p test label)
@@ -24,4 +23,3 @@
 
 (defun test-v3 ()
   (run v3 #P"05.in"))
-

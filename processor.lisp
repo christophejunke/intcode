@@ -11,6 +11,11 @@
 (defmethod c2mop:validate-superclass ((c processor-class) (s standard-class))
   t)
 
+(defun register-primitive (processor-class primitive)
+  (let ((primitives (processor-primitives processor-class)))
+    (unless (find primitive primitives)
+      (vector-push-extend primitive primitives (max 1 (length primitives))))))
+
 (defclass processor ()
   ((counter :initform 0 :accessor pc)
    (memory :reader memory :initarg :memory))

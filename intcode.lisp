@@ -6,5 +6,3 @@
 
 (defun memory-pathname (name)
   (merge-pathnames name (make-pathname :type "in" :defaults *root*)))
-
-

@@ -28,5 +28,5 @@
   (:method ((inst instruction))
     (argnames (args inst))))
 
-(defgeneric make-instruction 
+(defgeneric make-instruction
     (processor-prototype opcode nickname flow arguments store expr))
