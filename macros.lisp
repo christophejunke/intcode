@@ -1,5 +1,11 @@
 (in-package :advent.2019.intcode)
 
+;;; PROCESSORS
+
+(defmacro defproc (name supers slots)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (defclass ,name ,supers ,slots (:metaclass processor-class))))
+
 ;;; PRIMITIVES
 
 (defmacro define-special (name (processor &rest args) &body body)

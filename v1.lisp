@@ -2,9 +2,7 @@
 
 ;;;; INSTRUCTIONS
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defclass v1 (processor) ()
-    (:metaclass processor-class)))
+(defproc v1 (processor) ())
 
 (define-op (v1 99 :halt :flow :stop) (p)
   `(.halt ,p))

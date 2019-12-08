@@ -2,12 +2,10 @@
 
 (defvar *amplifier-controller* (make-memory #P"07.in"))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defclass v3/d7 (v3)
-    ((name :accessor name :initarg :name)
-     (in :accessor in :initarg :in)
-     (out :accessor out :initarg :out))
-    (:metaclass processor-class)))
+(defproc v3/d7 (v3)
+  ((name :accessor name :initarg :name)
+   (in :accessor in :initarg :in)
+   (out :accessor out :initarg :out)))
 
 (define-primitive .print ((p v3/d7) value)
   (funcall (out p) value))

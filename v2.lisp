@@ -2,9 +2,7 @@
 
 ;; day 5 - part 1
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defclass v2 (v1) ()
-    (:metaclass processor-class)))
+(defproc v2 (v1) ())
 
 (defun modebits (modes)
   (do ((bits 0) (i 0 (1+ i)))

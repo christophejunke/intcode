@@ -2,9 +2,7 @@
 
 ;; day 5 - part 2
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defclass v3 (v2) ()
-    (:metaclass processor-class)))
+(defproc v3 (v2) ())
 
 (define-special ..if (p test then else)
   `(if ,test ,then ,else))
