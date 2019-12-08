@@ -8,6 +8,8 @@
 
 ;;; PRIMITIVES
 
+;; TODO: make an expander generic function, and macrolet it when
+;; expanding instructions.
 (defmacro define-special (name (processor &rest args) &body body)
   "Like defmacro, but register name in processor class"
   (destructuring-bind (processor &optional (class 'processor))

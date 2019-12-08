@@ -43,20 +43,14 @@
 		   "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"))
 
 (assert
- (equalp
-  (let ((max 0))
-    (flet ((maximizer (value)
-	     (when (> value max)
-	       (setf max value))))
-      (map-permutations (lambda (phases)
-			  (handler-case
-			      (let ((chain (make-amplifiers phases #'maximizer)))
-				(map () #'run-program chain))
-			    (error (e)
-			      (warn "phase ~a: error ~s" phases e))))
-			#(0 1 2 3 4)))
-    max)
-  65464))
+ (= 65464
+    (let ((max 0))
+      (labels ((keep-max (value)
+		 (when (> value max) (setf max value)))
+	       (test (phases)
+		 (mapc #'run-program (make-amplifiers phases #'keep-max))))
+	(map-permutations #'test #(0 1 2 3 4)))
+      max)))
 
 ;; day 7 - part 2
 
@@ -67,18 +61,18 @@
 (assert
  (= 1518124
     (let ((max 0))
-      (flet ((run (p) (run-program p) (pc p))
-	     (maximize (value)
+      (flet ((run/pc (p) (run-program p) (pc p))
+	     (keep-max (value)
 	       (prog1 value
 		 (when (> value max)
 		   (setf max value)))))
 	(map-permutations
 	 (lambda (phases &aux chain)
-	   (flet ((end-of-chain (v) (qpush (in (first chain)) (maximize v))))
+	   (flet ((end-of-chain (v) (qpush (in (first chain)) (keep-max v))))
 	     (setf chain (make-amplifiers phases #'end-of-chain))
 	     (loop
 		for pre = (mapcar #'pc chain) then pcs
-		for pcs = (mapcar #'run chain)
+		for pcs = (mapcar #'run/pc chain)
 		until (equalp pcs pre))))
 	 #(5 6 7 8 9)))
       max)))
