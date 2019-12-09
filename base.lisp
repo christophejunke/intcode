@@ -47,9 +47,9 @@
 					 (+ ,$pc ,default-jump)))))))))))))))
 
 (defmethod make-instruction
-    (processor-prototype opcode nickname flow arguments store expr)
+    (processor-prototype opcode nickname flow %arguments store expr)
   (check-type store symbol)
-  (destructuring-bind (processor . arguments) arguments
+  (destructuring-bind (processor . arguments) %arguments
     (loop
        with flow = (ecase flow
 		     ((:stop 0 nil) :stop)
@@ -68,6 +68,8 @@
 		  'instruction
 		  :opcode opcode
 		  :store store
+		  :expr expr
+		  :params %arguments
 		  :args (coerce args$ 'vector)
 		  :control-flow flow
 		  :expander (eval

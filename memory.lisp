@@ -3,7 +3,7 @@
 (defclass memory ()
   ((%buffer :initarg :buffer :reader buffer)))
 
-(deftype opcode () 'fixnum)
+(deftype opcode () 'integer)
 
 (defgeneric make-memory (in)
   (:method ((buffer vector))

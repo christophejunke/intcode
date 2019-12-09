@@ -35,8 +35,8 @@
 (define-op (v2 03 :in :store addr) (p addr)
   `(.read ,p))
 
-(define-op (v2 04 :out) (p (a :addr))
-  `(.print ,p (.load ,p ,a)))
+(define-op (v2 04 :out) (p a)
+  `(.print ,p ,a))
 
 (equalp (buffer (memory (run v2 "1002,4,3,4,33")))
 	#(1002 4 3 4 99))

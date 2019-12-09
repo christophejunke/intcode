@@ -5,6 +5,8 @@
    (control-flow :reader control-flow :initarg :control-flow :initform :next)
    (args :reader args :initarg :args)
    (store :reader store :initarg :store)
+   (expr-params :reader params :initarg :params)
+   (expr :reader expression :initarg :expr)
    (expander :reader expander :initarg :expander)
    (mode-mask :reader mode-mask :initform 0 :initarg :mode-mask)
    (nick :reader nick :initarg :nick :initform "?")))
