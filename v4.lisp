@@ -11,31 +11,23 @@
 ;; (buffer (make-memory '("0,1,2" 10)))
 ;; #(0 1 2 0 0 0 0 0 0 0)
 
-(defproc v4 (v3) 
-  ((relative-base :initform 0 :accessor relative-base)))
+(defproc v4 (v3 modes-mixin) 
+  ((relative-base :initform 0 :accessor relative-base)
+   (%opcode-size :reader opcode-size-map)))
 
-(defun modes (modes size)
-  (let ((result (make-array size :initial-element 0)))
-    (prog1 result
-      (do ((digits nil) (i 0 (1+ i)))
-	  ((zerop modes) (replace result (nreverse digits)))
-	(multiple-value-bind (%m %d) (truncate modes 10)
-	  (push %d digits)
-	  (setf modes %m))))))
+(defmethod initialize-instance :after ((p v4) &key &allow-other-keys)
+  (setf (slot-value p '%opcode-size)
+	(alist-hash-table
+	 (mapcar (lambda (i)
+		   (cons (opcode i)
+			 (length (args i))))
+		 (instructions p)))))
 
-;; (modes 0 4)
-;; #(0 0 0 0)
-
-;; (modes 200 4)
-;; #(0 0 2 0)
-
-;; (modes 1200 4)
-;; #(0 0 2 1)
-
-(defmethod decode ((p v4) opcode)
+(defmethod decode ((p v4) opcode &aux (hash (opcode-size-map p)))
   (multiple-value-bind (modes opcode) (truncate opcode 100)
-    (let ((size (length (args (find opcode (instructions p) :key #'opcode)))))
-      (values opcode `(:modes ,(modes modes size))))))
+    (let ((size (gethash opcode hash)))
+      (parse-modes p modes size)
+      opcode)))
 
 (defmethod expand-execute ((processor-prototype v4)
 			   $proc
@@ -73,9 +65,9 @@
 			  (if bindings
 			      `((let ,bindings ,@inner))
 			      inner))))))
-      `((destructuring-bind (&key ((:modes ,$modes))) ,$options
-	  (declare (ignorable ,$modes))
-	  (check-type ,$modes (not null))
+      `((let ((,$modes (modes-of ,$proc)))
+	  (declare (type (vector mode ,(length (args instruction))) ,$modes)
+		   (ignorable ,$modes))
 	  (let ((,$buffer (buffer (memory ,$proc)))
 		(,$pc (pc ,$proc)))
 	    (declare (ignorable ,$buffer ,$pc))
@@ -144,12 +136,11 @@
 	   `(defmethod execute ((,$processor v4)
 				(,_ (eql ,opcode))
 				,$options)
-	      (declare (optimize (debug 3)))
+	      (declare (optimize (speed 3)))
 	      ,@(expand-execute prototype
 				$processor
 				$options
 				instruction))))))))
-
 
 (define-primitive .incbase ((p v4) delta)
   (incf (relative-base p) delta))
@@ -174,4 +165,21 @@
 
 ;; (run v4 '(#P"09.in" 2048))
 ;; (run v4 #P"05.in")
+
+(defproc v4/test (v4) ())
+(define-primitive .read ((p v4/test)) 2)
+
+(require 'sb-sprof)
+(flet ((run ()
+	 (run-program
+	  (make-instance 'v4/test :memory (make-memory '(#P"09.in" 2048))))))
+  (defun test-v4/time ()
+    (time (dotimes (i 50) (run))))
+
+  (defun test-v4/sprof ()
+    (sb-sprof:start-profiling)
+    (dotimes (i 50)
+      (run))
+    (sb-sprof:stop-profiling)
+    (sb-sprof:report)))
 
