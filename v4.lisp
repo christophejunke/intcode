@@ -75,6 +75,7 @@
 			      inner))))))
       `((destructuring-bind (&key ((:modes ,$modes))) ,$options
 	  (declare (ignorable ,$modes))
+	  (check-type ,$modes (not null))
 	  (let ((,$buffer (buffer (memory ,$proc)))
 		(,$pc (pc ,$proc)))
 	    (declare (ignorable ,$buffer ,$pc))
@@ -162,7 +163,7 @@
 
 (run v4 '("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99" 1000))
 
-(instructions 'v4)
+;; (instructions 'v4)
 
 ;; fixed an old bug
 (define-op (v2 04 :mul :store res) (p a b res)
@@ -170,8 +171,7 @@
 
 (run v4 '("1102,34915192,34915192,7,4,7,99,0" 1000))
 (run v4 '("104,1125899906842624,99" 1000))
-(run v4 '(#P"09.in" 2048))
 
-
+;; (run v4 '(#P"09.in" 2048))
 ;; (run v4 #P"05.in")
 
